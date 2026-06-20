@@ -42,7 +42,9 @@ export const builtinEndpointCatalog: EndpointDefinition[] = [
     ]
   },
   { group: "account", name: "verifyAccessTokenClient", method: "POST", path: "/account/verifyAccessTokenClient", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  { group: "account", name: "extendAccessToken", method: "POST", path: "/account/extendAccessToken", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "account", name: "getCredits", method: "POST", path: "/account/getCredits", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  { group: "account", name: "listPowerUpStat", method: "POST", path: "/account/listPowerUpStat", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "account", name: "getDustCost", method: "POST", path: "/account/getDustCost", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "account", name: "ownedSkins", method: "POST", path: "/account/ownedSkins", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "account", name: "servers", method: "POST", path: "/account/servers", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },

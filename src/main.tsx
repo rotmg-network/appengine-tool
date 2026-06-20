@@ -298,6 +298,8 @@ function App() {
     method: "GET",
     path: ""
   });
+  const [isEndpointModalOpen, setIsEndpointModalOpen] = useState(false);
+  const workspaceRef = useRef<HTMLElement | null>(null);
   const requestController = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -322,6 +324,17 @@ function App() {
   }, [allPresets, search]);
 
   const assertionResults = useMemo(() => evaluateAssertions(assertions, response), [assertions, response]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        event.preventDefault();
+        if (!isSending) void sendRequest();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
 
   function currentEnvironmentState(): EnvironmentState {
     return {
@@ -404,6 +417,10 @@ function App() {
     setFormParams(preset.method === "GET" ? [] : cloneRows(preset.params));
     setBodyType(preset.method === "GET" ? "none" : "form");
     setActiveTab(preset.method === "GET" ? "params" : "body");
+    requestAnimationFrame(() => {
+      workspaceRef.current?.scrollIntoView({ block: "start" });
+      window.scrollTo({ top: 0 });
+    });
   }
 
   function persistVariables(next: KeyValueRow[]) {
@@ -436,6 +453,7 @@ function App() {
     };
     persistCustomEndpoints([...customEndpoints, nextEndpoint]);
     setNewEndpoint({ group: "custom", name: "", method: "GET", path: "" });
+    setIsEndpointModalOpen(false);
   }
 
   function removeCustomEndpoint(endpoint: EndpointPreset) {
@@ -635,35 +653,12 @@ function App() {
           <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search endpoints" />
         </label>
 
-        <section className="endpoint-editor">
-          <div className="group-title">Add endpoint</div>
-          <div className="endpoint-form">
-            <input
-              value={newEndpoint.group}
-              onChange={(event) => setNewEndpoint({ ...newEndpoint, group: event.target.value })}
-              placeholder="Group"
-            />
-            <input
-              value={newEndpoint.name}
-              onChange={(event) => setNewEndpoint({ ...newEndpoint, name: event.target.value })}
-              placeholder="Name"
-            />
-            <select value={newEndpoint.method} onChange={(event) => setNewEndpoint({ ...newEndpoint, method: event.target.value })}>
-              {["GET", "POST", "PUT", "PATCH", "DELETE"].map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-            <input
-              value={newEndpoint.path}
-              onChange={(event) => setNewEndpoint({ ...newEndpoint, path: event.target.value })}
-              placeholder="/path"
-            />
-            <button className="add-row endpoint-add-button" onClick={addCustomEndpoint}>
-              <Plus size={15} />
-              Add
-            </button>
-          </div>
-        </section>
+        <div className="sidebar-action">
+          <button className="add-row endpoint-add-button" onClick={() => setIsEndpointModalOpen(true)}>
+            <Plus size={15} />
+            Add endpoint
+          </button>
+        </div>
 
         <div className="sidebar-scroll">
           {[...groupedPresets.entries()].map(([group, items]) => (
@@ -705,7 +700,7 @@ function App() {
         </div>
       </aside>
 
-      <main className="workspace">
+      <main className="workspace" ref={workspaceRef}>
         <header className="topbar">
           <label className="environment-picker">
             <span>Environment</span>
@@ -880,6 +875,60 @@ function App() {
           </aside>
         </section>
       </main>
+      {isEndpointModalOpen && (
+        <div className="modal-backdrop" role="presentation" onClick={() => setIsEndpointModalOpen(false)}>
+          <section className="modal" role="dialog" aria-modal="true" aria-labelledby="endpoint-modal-title" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-head">
+              <strong id="endpoint-modal-title">Add endpoint</strong>
+              <button className="icon-button small" title="Close" onClick={() => setIsEndpointModalOpen(false)}>
+                <XCircle size={14} />
+              </button>
+            </div>
+            <div className="endpoint-form modal-endpoint-form">
+              <label>
+                Group
+                <input
+                  value={newEndpoint.group}
+                  onChange={(event) => setNewEndpoint({ ...newEndpoint, group: event.target.value })}
+                  placeholder="custom"
+                />
+              </label>
+              <label>
+                Name
+                <input
+                  autoFocus
+                  value={newEndpoint.name}
+                  onChange={(event) => setNewEndpoint({ ...newEndpoint, name: event.target.value })}
+                  placeholder="endpointName"
+                />
+              </label>
+              <label>
+                Method
+                <select value={newEndpoint.method} onChange={(event) => setNewEndpoint({ ...newEndpoint, method: event.target.value })}>
+                  {["GET", "POST", "PUT", "PATCH", "DELETE"].map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="wide-field">
+                Path
+                <input
+                  value={newEndpoint.path}
+                  onChange={(event) => setNewEndpoint({ ...newEndpoint, path: event.target.value })}
+                  placeholder="/path"
+                />
+              </label>
+            </div>
+            <div className="modal-actions">
+              <button className="soft-button" onClick={() => setIsEndpointModalOpen(false)}>Cancel</button>
+              <button className="send-button modal-submit" onClick={addCustomEndpoint}>
+                <Plus size={15} />
+                Add endpoint
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

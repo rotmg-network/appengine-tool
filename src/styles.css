@@ -143,15 +143,27 @@ button {
   padding: 0 10px 16px;
 }
 
-.endpoint-editor {
-  padding: 0 10px 10px;
+.sidebar-action {
+  padding: 0 14px 12px;
   border-bottom: 1px solid var(--border-soft);
+}
+
+.sidebar-action .endpoint-add-button {
+  width: 100%;
 }
 
 .endpoint-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 7px;
+}
+
+.endpoint-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .endpoint-form input,
@@ -167,7 +179,8 @@ button {
 }
 
 .endpoint-form input[placeholder="/path"],
-.endpoint-add-button {
+.endpoint-add-button,
+.wide-field {
   grid-column: 1 / -1;
 }
 
@@ -567,6 +580,49 @@ button {
   gap: 8px;
   align-items: center;
   padding: 0 10px 10px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(3, 7, 18, 0.62);
+}
+
+.modal {
+  width: min(520px, 100%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.36);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.modal-endpoint-form {
+  padding: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.modal-submit {
+  min-width: 132px;
 }
 
 .response-search {
