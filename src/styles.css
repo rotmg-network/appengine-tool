@@ -656,6 +656,22 @@ button {
   color: var(--danger);
 }
 
+.error-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.error-pane .code-view {
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+.retry-button {
+  align-self: flex-start;
+}
+
 .history-panel {
   min-height: 430px;
 }

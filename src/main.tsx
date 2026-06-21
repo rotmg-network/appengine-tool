@@ -198,6 +198,19 @@ const defaultVariables = [
 ];
 const defaultAssertions: Assertion[] = [{ id: crypto.randomUUID(), kind: "status", expected: "200" }];
 
+function backendDownMessage(status?: number) {
+  const statusNote = status ? ` (proxy responded ${status})` : "";
+  return (
+    `Could not reach the backend proxy server on http://127.0.0.1:8787${statusNote}.\n\n` +
+    "The web UI forwards every request through that proxy, so it must be running.\n" +
+    "Start it with one of:\n" +
+    "  • npm start        (builds the UI and runs the proxy + web server together)\n" +
+    "  • npm run dev      (proxy + Vite dev server)\n" +
+    "  • npm run dev:proxy (proxy only, if the web server is already running)\n\n" +
+    "Once it is up, press Retry below."
+  );
+}
+
 function loadStorage<T>(key: string, fallback: T): T {
   try {
     const value = localStorage.getItem(key);
@@ -499,7 +512,19 @@ function App() {
         body: JSON.stringify(payload),
         signal: controller.signal
       });
-      const data = (await result.json()) as ProxyResponse;
+      const text = await result.text();
+      let data: ProxyResponse;
+      try {
+        data = JSON.parse(text) as ProxyResponse;
+      } catch {
+        // The proxy returned a non-JSON (usually empty) body. This almost always means the
+        // backend proxy server isn't running, so the Vite dev/preview proxy could not connect.
+        data = {
+          ok: false,
+          status: result.status || undefined,
+          error: backendDownMessage(result.status)
+        };
+      }
       setResponse(data);
       setResponseTab("body");
       const nextHistory = [
@@ -525,6 +550,12 @@ function App() {
           ok: false,
           error: "Request cancelled",
           elapsedMs: 0
+        });
+      } else if (error instanceof TypeError) {
+        // A TypeError from fetch means the request never completed (network/proxy failure).
+        setResponse({
+          ok: false,
+          error: backendDownMessage()
         });
       } else {
         setResponse({
@@ -849,7 +880,7 @@ function App() {
                 ["rawResponse", "Raw Response"]
               ]}
             />
-            <ResponseViewer tab={responseTab} response={response} />
+            <ResponseViewer tab={responseTab} response={response} onRetry={sendRequest} isSending={isSending} />
           </div>
 
           <aside className="panel history-panel">
@@ -1105,10 +1136,32 @@ function AssertionEditor({
   );
 }
 
-function ResponseViewer({ tab, response }: { tab: ResponseTab; response: ProxyResponse | null }) {
+function ResponseViewer({
+  tab,
+  response,
+  onRetry,
+  isSending
+}: {
+  tab: ResponseTab;
+  response: ProxyResponse | null;
+  onRetry?: () => void;
+  isSending?: boolean;
+}) {
   const [search, setSearch] = useState("");
   if (!response) return <div className="empty-state">No response</div>;
-  if (response.error) return <CodePane value={response.error} error />;
+  if (response.error) {
+    return (
+      <div className="error-pane">
+        <CodePane value={response.error} error />
+        {onRetry && (
+          <button className="send-button retry-button" onClick={onRetry} disabled={isSending}>
+            {isSending ? <RefreshCw className="spin" size={16} /> : <RefreshCw size={16} />}
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
 
   if (tab === "body") {
     return <CodePane value={formatBody(response.body || "", response.headers?.["content-type"] || "")} search={search} setSearch={setSearch} filename="response-body.txt" />;

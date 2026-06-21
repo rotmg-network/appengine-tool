@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "npm run build && concurrently -k -n proxy,web -c cyan,magenta \"node server/index.js\" \"vite preview --host 127.0.0.1\"",
     "dev": "concurrently -k -n proxy,web -c cyan,magenta \"node server/index.js\" \"vite --host 127.0.0.1\"",
     "dev:proxy": "node server/index.js",
     "dev:web": "vite --host 127.0.0.1",
     "build": "tsc && vite build",
-    "preview": "vite preview --host 127.0.0.1",
+    "preview": "concurrently -k -n proxy,web -c cyan,magenta \"node server/index.js\" \"vite preview --host 127.0.0.1\"",
     "check": "tsc --noEmit"
   },
   "dependencies": {
