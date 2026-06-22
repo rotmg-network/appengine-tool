@@ -28,15 +28,15 @@ The app is similar in spirit to Postman or Insomnia, but focused on the RotMG Ap
 
 Built-in environments:
 
-| Env         | URL  |
-|-------------|------|
-| Production  | `https://realmofthemadgodhrd.appspot.com` |
-| Testing     | `https://rotmgtesting.appspot.com` |
-| Testing2    | `https://realmtesting2.appspot.com` |
-| Testing3    | `https://rotmgtesting3.appspot.com` |
-| Testing4    | `https://rotmgtesting4.appspot.com` |
-| Testing5    | `https://rotmgtesting5.appspot.com` |
-| Custom     | `custom URL` |
+| Env        | URL                                       |
+| ---------- | ----------------------------------------- |
+| Production | `https://realmofthemadgodhrd.appspot.com` |
+| Testing    | `https://rotmgtesting.appspot.com`        |
+| Testing2   | `https://realmtesting2.appspot.com`       |
+| Testing3   | `https://rotmgtesting3.appspot.com`       |
+| Testing4   | `https://rotmgtesting4.appspot.com`       |
+| Testing5   | `https://rotmgtesting5.appspot.com`       |
+| Custom     | `custom URL`                              |
 
 Each environment stores its own draft request, params, body, headers, variables, saved requests, history, timeout, cookie toggle, and redirect toggle in `localStorage`
 
@@ -69,7 +69,8 @@ The API proxy runs on `127.0.0.1:8787`.
 The browser app sends requests to the local Express proxy at `/api/send`  
 The proxy then routes the request to AppEngine
 
-This avoids browser CORS limitations and allows the tool to manage:  
+This avoids browser CORS limitations and allows the tool to manage:
+
 - Request cookies
 - Raw request/response breakdowns
 - Redirect behavior
@@ -89,12 +90,16 @@ Then open in a web browser: [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
 ## Scripts
 
 ```bash
-npm run dev        # Run Vite and Express proxy together
+npm start          # Build the UI, then run the proxy + preview server together
+npm run dev        # Run Vite and the Express proxy together (watch mode)
 npm run dev:web    # Run only the Vite frontend
 npm run dev:proxy  # Run only the Express proxy
-npm run check      # Type-check TypeScript
+npm run check      # Type-check the frontend and the server
 npm run build      # Type-check and create production build
-npm run preview    # Preview the built frontend
+npm run preview    # Build preview: proxy + Vite preview together
+npm test           # Run the Vitest unit tests
+npm run lint       # Run ESLint
+npm run format     # Format the codebase with Prettier
 ```
 
 ## Assertions
@@ -125,15 +130,22 @@ Exported data can include local variables and saved request parameters. Treat ex
 ```text
 .
 ├── server/
-│   └── index.js        # Local Express proxy
+│   └── index.ts          # Local Express proxy (run with tsx)
 ├── src/
+│   ├── components/        # React UI components
+│   ├── lib/              # Pure helpers + their *.test.ts unit tests
+│   ├── constants.ts      # Environments, choices, defaults
 │   ├── endpointCatalog.ts # Built-in endpoint definitions
-│   ├── main.tsx        # React app
-│   └── styles.css      # App styling and themes
+│   ├── types.ts          # Shared type definitions
+│   ├── App.tsx           # Root component
+│   ├── main.tsx          # React entry point
+│   └── styles.css        # App styling and themes
 ├── index.html
 ├── package.json
-├── tsconfig.json
-└── vite.config.ts
+├── tsconfig.json         # Frontend TypeScript config
+├── tsconfig.server.json  # Server TypeScript config
+├── eslint.config.js
+└── vite.config.ts        # Vite + Vitest config
 ```
 
 ## Notes
