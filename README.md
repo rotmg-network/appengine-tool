@@ -21,6 +21,7 @@ The app is similar in spirit to Postman or Insomnia, but focused on the RotMG Ap
 - Request timeout and cancellation
 - Response tabs for body, headers, cookies, timing, raw request, and raw response
 - Response search, copy, and download controls
+- Optional `ffuf` fuzzing tab with rate/time caps and local JSON output
 - Light and dark themes, defaulting to dark
 - Import/export of all environment workspaces
 
@@ -28,6 +29,7 @@ The app is similar in spirit to Postman or Insomnia, but focused on the RotMG Ap
 
 Built-in environments:
 
+<<<<<<< Updated upstream
 | Env        | URL                                       |
 | ---------- | ----------------------------------------- |
 | Production | `https://realmofthemadgodhrd.appspot.com` |
@@ -37,6 +39,18 @@ Built-in environments:
 | Testing4   | `https://rotmgtesting4.appspot.com`       |
 | Testing5   | `https://rotmgtesting5.appspot.com`       |
 | Custom     | `custom URL`                              |
+=======
+| Env         | URL  |
+|-------------|------|
+| Production  | `https://realmofthemadgodhrd.appspot.com` |
+| Testing     | `https://rotmghrdtesting.appspot.com` |
+| Current testing | `https://rotmgtesting.appspot.com` |
+| Realm testing 2 | `https://realmtesting2.appspot.com` |
+| RotMG testing 3 | `https://rotmgtesting3.appspot.com` |
+| RotMG testing 4 | `https://rotmgtesting4.appspot.com` |
+| RotMG testing 5 | `https://rotmgtesting5.appspot.com` |
+| Custom     | `custom URL` |
+>>>>>>> Stashed changes
 
 Each environment stores its own draft request, params, body, headers, variables, saved requests, history, timeout, cookie toggle, and redirect toggle in `localStorage`
 
@@ -82,7 +96,7 @@ This avoids browser CORS limitations and allows the tool to manage:
 ```bash
 npm install   # Install dependencies:
 npm run dev   # Start the app in dev mode
-npm start     # Start the app normally
+npm run preview # Preview the production build with the proxy
 ```
 
 Then open in a web browser: [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
@@ -96,10 +110,14 @@ npm run dev:web    # Run only the Vite frontend
 npm run dev:proxy  # Run only the Express proxy
 npm run check      # Type-check the frontend and the server
 npm run build      # Type-check and create production build
+<<<<<<< Updated upstream
 npm run preview    # Build preview: proxy + Vite preview together
 npm test           # Run the Vitest unit tests
 npm run lint       # Run ESLint
 npm run format     # Format the codebase with Prettier
+=======
+npm run preview    # Preview the built frontend and Express proxy together
+>>>>>>> Stashed changes
 ```
 
 ## Assertions
@@ -119,6 +137,45 @@ For XML path assertions, use slash-separated element names such as:
 Chars/Char/Equipment
 ```
 
+## Fuzzing With ffuf
+
+The Fuzz tab can run a local `ffuf` process through the Express proxy. `ffuf` is optional; normal request testing works without it.
+
+The proxy looks for `ffuf` in this order:
+
+1. `tools/ffuf` or `tools/ffuf.exe`
+2. `bin/ffuf` or `bin/ffuf.exe`
+3. `ffuf` on `PATH`
+
+If you keep the binary in the repo, make sure it is executable:
+
+```bash
+chmod +x tools/ffuf
+```
+
+Then restart the proxy so `/api/fuzz/meta` can detect it.
+
+The integration is intentionally bounded for respectful authorized testing:
+
+- Server-side rate clamp: 1 to 10 requests per second
+- Server-side timeout clamp: 3 to 30 seconds
+- Server-side max-time clamp: 10 to 300 seconds
+- Recursion is off by default and capped at depth 2
+- Results are written to `.ffuf-runs/`, which is ignored by git
+
+Bundled wordlists live in `wordlists/`:
+
+- `endpoints-small.txt`
+- `params-small.txt`
+- `rotmg-known-params.txt`
+
+Supported modes:
+
+- Find endpoint names: appends `FUZZ` under the selected search folder
+- Find nested endpoints: same target shape with optional subfolder discovery
+- Find query parameters: sends `?FUZZ=test` on the current request path
+- Find form parameters: sends form data with `FUZZ=test` on the current request path
+
 ## Import And Export
 
 The export button writes a JSON collection containing all environment workspaces. Imports support both the current multi-environment format and the earlier single-environment format.
@@ -130,16 +187,27 @@ Exported data can include local variables and saved request parameters. Treat ex
 ```text
 .
 ├── server/
+<<<<<<< Updated upstream
 │   └── index.ts          # Local Express proxy (run with tsx)
+=======
+│   ├── ffufRunner.js   # Optional local ffuf process routes
+│   └── index.js        # Local Express proxy
+>>>>>>> Stashed changes
 ├── src/
 │   ├── components/        # React UI components
 │   ├── lib/              # Pure helpers + their *.test.ts unit tests
 │   ├── constants.ts      # Environments, choices, defaults
 │   ├── endpointCatalog.ts # Built-in endpoint definitions
+<<<<<<< Updated upstream
 │   ├── types.ts          # Shared type definitions
 │   ├── App.tsx           # Root component
 │   ├── main.tsx          # React entry point
 │   └── styles.css        # App styling and themes
+=======
+│   ├── main.tsx        # React app
+│   └── styles.css      # App styling and themes
+├── wordlists/          # Small starter lists for ffuf
+>>>>>>> Stashed changes
 ├── index.html
 ├── package.json
 ├── tsconfig.json         # Frontend TypeScript config
