@@ -1,0 +1,7 @@
+dist
+node_modules
+coverage
+package-lock.json
+
+# Intentionally kept as a compact one-entry-per-line data table
+src/endpointCatalog.ts
