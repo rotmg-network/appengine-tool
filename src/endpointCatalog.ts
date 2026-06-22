@@ -188,7 +188,11 @@ export const builtinEndpointCatalog: EndpointDefinition[] = [
   { group: "guild", name: "getBoard", method: "POST", path: "/guild/getBoard", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "guild", name: "setBoard", method: "POST", path: "/guild/setBoard", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }, { key: "board" }] },
   { group: "guild", name: "listMembers", method: "POST", path: "/guild/listMembers", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+<<<<<<< Updated upstream
   // * /missions/ * //
+=======
+  { group: "news", name: "list", method: "POST", path: "/news/list", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+>>>>>>> Stashed changes
   { group: "missions", name: "getClientSeasons", method: "POST", path: "/missions/getClientSeasons", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "missions", name: "getPlayerMissions", method: "POST", path: "/missions/getPlayerMissions", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /mysterybox/ * //
