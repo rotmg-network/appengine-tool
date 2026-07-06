@@ -22,7 +22,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ["server/**/*.ts", "*.config.{js,ts}"],
+    files: ["server/**/*.{ts,js}", "*.config.{js,ts}"],
     languageOptions: {
       ecmaVersion: 2022,
       globals: { ...globals.node, ...globals.browser }
