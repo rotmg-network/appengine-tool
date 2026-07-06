@@ -13,15 +13,11 @@ export default defineConfig({
     proxy
   },
   preview: {
-<<<<<<< Updated upstream
     port: 4173,
     proxy
   },
   test: {
     environment: "jsdom",
     include: ["src/**/*.{test,spec}.{ts,tsx}"]
-=======
-    proxy
->>>>>>> Stashed changes
   }
 });

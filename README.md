@@ -29,28 +29,16 @@ The app is similar in spirit to Postman or Insomnia, but focused on the RotMG Ap
 
 Built-in environments:
 
-<<<<<<< Updated upstream
-| Env        | URL                                       |
-| ---------- | ----------------------------------------- |
-| Production | `https://realmofthemadgodhrd.appspot.com` |
-| Testing    | `https://rotmgtesting.appspot.com`        |
-| Testing2   | `https://realmtesting2.appspot.com`       |
-| Testing3   | `https://rotmgtesting3.appspot.com`       |
-| Testing4   | `https://rotmgtesting4.appspot.com`       |
-| Testing5   | `https://rotmgtesting5.appspot.com`       |
-| Custom     | `custom URL`                              |
-=======
-| Env         | URL  |
-|-------------|------|
-| Production  | `https://realmofthemadgodhrd.appspot.com` |
-| Testing     | `https://rotmghrdtesting.appspot.com` |
-| Current testing | `https://rotmgtesting.appspot.com` |
-| Realm testing 2 | `https://realmtesting2.appspot.com` |
-| RotMG testing 3 | `https://rotmgtesting3.appspot.com` |
-| RotMG testing 4 | `https://rotmgtesting4.appspot.com` |
-| RotMG testing 5 | `https://rotmgtesting5.appspot.com` |
-| Custom     | `custom URL` |
->>>>>>> Stashed changes
+| Env             | URL                                       |
+| --------------- | ----------------------------------------- |
+| Production      | `https://realmofthemadgodhrd.appspot.com` |
+| Testing         | `https://rotmghrdtesting.appspot.com`     |
+| Current testing | `https://rotmgtesting.appspot.com`        |
+| Realm testing 2 | `https://realmtesting2.appspot.com`       |
+| RotMG testing 3 | `https://rotmgtesting3.appspot.com`       |
+| RotMG testing 4 | `https://rotmgtesting4.appspot.com`       |
+| RotMG testing 5 | `https://rotmgtesting5.appspot.com`       |
+| Custom          | `custom URL`                              |
 
 Each environment stores its own draft request, params, body, headers, variables, saved requests, history, timeout, cookie toggle, and redirect toggle in `localStorage`
 
@@ -110,14 +98,10 @@ npm run dev:web    # Run only the Vite frontend
 npm run dev:proxy  # Run only the Express proxy
 npm run check      # Type-check the frontend and the server
 npm run build      # Type-check and create production build
-<<<<<<< Updated upstream
-npm run preview    # Build preview: proxy + Vite preview together
+npm run preview    # Preview the built frontend and Express proxy together
 npm test           # Run the Vitest unit tests
 npm run lint       # Run ESLint
 npm run format     # Format the codebase with Prettier
-=======
-npm run preview    # Preview the built frontend and Express proxy together
->>>>>>> Stashed changes
 ```
 
 ## Assertions
@@ -187,27 +171,19 @@ Exported data can include local variables and saved request parameters. Treat ex
 ```text
 .
 ├── server/
-<<<<<<< Updated upstream
+│   ├── ffufRunner.js     # Optional local ffuf process routes
 │   └── index.ts          # Local Express proxy (run with tsx)
-=======
-│   ├── ffufRunner.js   # Optional local ffuf process routes
-│   └── index.js        # Local Express proxy
->>>>>>> Stashed changes
 ├── src/
 │   ├── components/        # React UI components
 │   ├── lib/              # Pure helpers + their *.test.ts unit tests
 │   ├── constants.ts      # Environments, choices, defaults
 │   ├── endpointCatalog.ts # Built-in endpoint definitions
-<<<<<<< Updated upstream
 │   ├── types.ts          # Shared type definitions
 │   ├── App.tsx           # Root component
 │   ├── main.tsx          # React entry point
 │   └── styles.css        # App styling and themes
-=======
-│   ├── main.tsx        # React app
-│   └── styles.css      # App styling and themes
-├── wordlists/          # Small starter lists for ffuf
->>>>>>> Stashed changes
+├── wordlists/            # Small starter lists for ffuf
+├── tools/                # Optional local ffuf binary
 ├── index.html
 ├── package.json
 ├── tsconfig.json         # Frontend TypeScript config

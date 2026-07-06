@@ -1,11 +1,6 @@
-<<<<<<< Updated upstream:server/index.ts
 import express, { type Request, type Response } from "express";
 import { Cookie, CookieJar } from "tough-cookie";
-=======
-import express from "express";
-import { CookieJar } from "tough-cookie";
 import { registerFuzzRoutes } from "./ffufRunner.js";
->>>>>>> Stashed changes:server/index.js
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
@@ -269,7 +264,7 @@ server.ref();
 
 const keepAlive = setInterval(() => {}, 2 ** 31 - 1);
 
-function shutdown(signal) {
+function shutdown(signal: string) {
   clearInterval(keepAlive);
   server.close(() => {
     console.log(`Proxy stopped by ${signal}`);
