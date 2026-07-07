@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Cookie, RefreshCw } from "lucide-react";
 import { CodePane } from "./CodePane";
 import { formatBody } from "../lib/format";
+import { detectHighlightLanguage } from "../lib/highlight";
 import type { ProxyResponse, ResponseTab } from "../types";
 
 export function ResponseViewer({
@@ -32,9 +33,12 @@ export function ResponseViewer({
   }
 
   if (tab === "body") {
+    const rawBody = response.body || "";
+    const contentType = response.headers?.["content-type"] || "";
     return (
       <CodePane
-        value={formatBody(response.body || "", response.headers?.["content-type"] || "")}
+        value={formatBody(rawBody, contentType)}
+        language={detectHighlightLanguage(rawBody, contentType)}
         search={search}
         setSearch={setSearch}
         filename="response-body.txt"
@@ -45,6 +49,7 @@ export function ResponseViewer({
     return (
       <CodePane
         value={JSON.stringify(response.headers || {}, null, 2)}
+        language="json"
         search={search}
         setSearch={setSearch}
         filename="response-headers.json"
