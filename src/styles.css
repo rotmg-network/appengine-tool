@@ -28,6 +28,7 @@
   --success: #5fd1a5;
   --danger: #f08a8a;
   --warning: #f2c66d;
+  --tok-number: #d6a2ff;
   background: var(--bg);
   color: var(--text);
 }
@@ -52,6 +53,7 @@
   --success: #16865d;
   --danger: #c24141;
   --warning: #b7791f;
+  --tok-number: #8b3fd6;
   background: var(--bg);
   color: var(--text);
 }
@@ -224,7 +226,81 @@ button {
 
 .endpoint-button:hover,
 .saved-button:hover,
-.history-list button:hover {
+.history-list button:hover,
+.endpoint-row:hover .endpoint-button {
+  background: var(--panel-hover);
+}
+
+.endpoint-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.endpoint-row .endpoint-button {
+  flex: 1;
+  min-width: 0;
+  grid-template-columns: 46px 1fr;
+}
+
+.endpoint-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.endpoint-actions {
+  position: absolute;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  padding-left: 10px;
+  opacity: 0;
+  border-radius: 6px;
+  background: var(--panel-hover);
+}
+
+.endpoint-row:hover .endpoint-actions,
+.endpoint-actions:focus-within {
+  opacity: 1;
+}
+
+.endpoint-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.endpoint-action:hover {
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+.restore-endpoints {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.restore-endpoints:hover {
+  color: var(--text-strong);
   background: var(--panel-hover);
 }
 
@@ -725,12 +801,66 @@ button {
   font-family: "SFMono-Regular", Consolas, monospace;
 }
 
+.code-view .tok-tag {
+  color: var(--accent);
+}
+
+.code-view .tok-attr {
+  color: var(--warning);
+}
+
+.code-view .tok-string {
+  color: var(--success);
+}
+
+.code-view .tok-number {
+  color: var(--tok-number);
+}
+
+.code-view .tok-keyword {
+  color: var(--danger);
+}
+
+.code-view .tok-comment {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.code-view .tok-cdata {
+  color: var(--muted-strong);
+}
+
+.code-view .tok-punct {
+  color: var(--muted-strong);
+}
+
+.code-view .tok-text {
+  color: var(--text);
+}
+
+.code-view .search-hit {
+  border-radius: 2px;
+  color: inherit;
+  background: color-mix(in srgb, var(--warning) 42%, transparent);
+}
+
+.code-view .search-hit.active {
+  color: var(--accent-text);
+  background: var(--accent);
+}
+
 .response-tools {
   display: grid;
   grid-template-columns: minmax(180px, 1fr) auto 32px 32px;
   gap: 8px;
   align-items: center;
   padding: 0 10px 10px;
+}
+
+.match-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .modal-backdrop {
@@ -997,7 +1127,7 @@ button {
     grid-template-columns: 1fr 32px 32px;
   }
 
-  .match-count {
+  .match-nav {
     display: none;
   }
 
