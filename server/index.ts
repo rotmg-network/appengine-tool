@@ -1,5 +1,11 @@
+<<<<<<< Updated upstream:server/index.ts
 import express, { type Request, type Response } from "express";
 import { Cookie, CookieJar } from "tough-cookie";
+=======
+import express from "express";
+import { CookieJar } from "tough-cookie";
+import { registerFuzzRoutes } from "./ffufRunner.js";
+>>>>>>> Stashed changes:server/index.js
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
@@ -254,6 +260,22 @@ app.post("/api/send", async (request: Request, response: Response) => {
   }
 });
 
-app.listen(port, "127.0.0.1", () => {
+registerFuzzRoutes(app, { environments, normalizeBaseUrl });
+
+const server = app.listen(port, "127.0.0.1", () => {
   console.log(`Proxy listening on http://127.0.0.1:${port}`);
 });
+server.ref();
+
+const keepAlive = setInterval(() => {}, 2 ** 31 - 1);
+
+function shutdown(signal) {
+  clearInterval(keepAlive);
+  server.close(() => {
+    console.log(`Proxy stopped by ${signal}`);
+    process.exit(0);
+  });
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

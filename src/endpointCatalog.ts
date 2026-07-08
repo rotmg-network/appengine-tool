@@ -202,6 +202,9 @@ export const builtinEndpointCatalog: EndpointDefinition[] = [
   { group: "leaderboards", name: "getPlayersRanks", method: "POST", path: "/leaderboards/getPlayersRanks", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "leaderboards", name: "getBoardActive", method: "POST", path: "/leaderboards/getBoardActive", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /missions/ * //
+=======
+  { group: "news", name: "list", method: "POST", path: "/news/list", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+>>>>>>> Stashed changes
   { group: "missions", name: "getClientSeasons", method: "POST", path: "/missions/getClientSeasons", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "missions", name: "getCompetition", method: "POST", path: "/missions/getCompetition", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "missions", name: "getCompetitionScore", method: "POST", path: "/missions/getCompetitionScore", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },

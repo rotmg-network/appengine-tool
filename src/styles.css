@@ -459,7 +459,8 @@ button {
 }
 
 .kv-editor,
-.assertions {
+.assertions,
+.fuzz-panel {
   padding: 0 10px 10px;
 }
 
@@ -486,6 +487,8 @@ button {
 .kv-row select,
 .assertion-row input,
 .assertion-row select,
+.fuzz-controls input,
+.fuzz-controls select,
 .raw-editor {
   width: 100%;
   min-height: 35px;
@@ -508,6 +511,148 @@ button {
 
 .add-row {
   margin-top: 3px;
+}
+
+.fuzz-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.fuzz-sections {
+  display: grid;
+  gap: 10px;
+}
+
+.fuzz-section {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+  background: var(--panel-soft);
+}
+
+.fuzz-section-title {
+  display: grid;
+  gap: 2px;
+}
+
+.fuzz-section-title span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fuzz-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.target-controls {
+  grid-template-columns: minmax(220px, 1.2fr) minmax(160px, 0.9fr) minmax(140px, 0.9fr);
+}
+
+.limit-controls {
+  grid-template-columns: repeat(3, minmax(130px, 1fr)) minmax(140px, auto) minmax(100px, 0.6fr);
+}
+
+.fuzz-controls label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fuzz-controls .check-field {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 35px;
+  padding-top: 22px;
+  color: var(--muted-strong);
+}
+
+.fuzz-controls input[type="checkbox"] {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+.fuzz-actions,
+.fuzz-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.fuzz-actions .send-button,
+.fuzz-actions .cancel-button {
+  width: auto;
+  padding: 0 14px;
+}
+
+.fuzz-job {
+  display: grid;
+  gap: 8px;
+}
+
+.fuzz-summary {
+  min-height: 30px;
+  color: var(--muted-strong);
+}
+
+.fuzz-summary span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fuzz-panel .code-view {
+  min-height: auto;
+  max-height: 170px;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+}
+
+.fuzz-results {
+  overflow: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: 7px;
+}
+
+.fuzz-results .empty-state {
+  min-height: 92px;
+}
+
+.fuzz-results-head,
+.fuzz-result-row {
+  display: grid;
+  grid-template-columns: 68px 82px 70px 62px minmax(120px, 0.8fr) minmax(260px, 1.6fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 760px;
+  padding: 8px 10px;
+}
+
+.fuzz-results-head {
+  color: var(--muted);
+  background: var(--panel-soft);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.fuzz-result-row {
+  border-top: 1px solid var(--border-soft);
+  font-size: 12px;
+}
+
+.fuzz-result-row code {
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .response-grid {
@@ -801,6 +946,15 @@ button {
     width: 100%;
     min-width: 0;
   }
+
+  .fuzz-controls {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+
+  .target-controls,
+  .limit-controls {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -827,6 +981,15 @@ button {
   }
 
   .request-line {
+    grid-template-columns: 1fr;
+  }
+
+  .fuzz-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .target-controls,
+  .limit-controls {
     grid-template-columns: 1fr;
   }
 
