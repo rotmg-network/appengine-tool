@@ -41,6 +41,7 @@ export const choices: Record<string, string[]> = {
 };
 
 export const customEndpointsStorageKey = "rotmg:custom-endpoints";
+export const endpointOverridesStorageKey = "rotmg:endpoint-overrides";
 
 export const UNITY_HEADERS = {
   "User-Agent": "UnityPlayer/2021.3.16f1 (UnityWebRequest/1.0, libcurl/7.84.0-DEV)",

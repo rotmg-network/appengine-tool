@@ -5,9 +5,11 @@ import {
   Download,
   History,
   Moon,
+  Pencil,
   Play,
   Plus,
   RefreshCw,
+  RotateCcw,
   Save,
   Search,
   Sun,
@@ -16,7 +18,13 @@ import {
   XCircle
 } from "lucide-react";
 import { type EndpointDefinition } from "./endpointCatalog";
-import { customEndpointsStorageKey, environmentKeys, environmentOptions, environments } from "./constants";
+import {
+  customEndpointsStorageKey,
+  endpointOverridesStorageKey,
+  environmentKeys,
+  environmentOptions,
+  environments
+} from "./constants";
 import { AssertionEditor } from "./components/AssertionEditor";
 import { BodyEditor } from "./components/BodyEditor";
 import { HeaderEditor } from "./components/HeaderEditor";
@@ -27,7 +35,11 @@ import { backendDownMessage } from "./lib/api";
 import { evaluateAssertions } from "./lib/assertions";
 import { environmentReducer, loadAllEnvironmentStates, loadEnvironmentState } from "./lib/environmentState";
 import { interpolate, resolveRows } from "./lib/interpolate";
-import { builtinPresets, endpointFromDefinition } from "./lib/presets";
+import {
+  buildSidebarEndpoints,
+  type EndpointOverrides,
+  type SidebarEndpoint
+} from "./lib/presets";
 import { cloneRows, extractAccessToken, parseRawHeaders, upsertVariable } from "./lib/rows";
 import { envStorageKey, loadStorage, saveStorage } from "./lib/storage";
 import type {
@@ -61,12 +73,16 @@ export function App() {
   const [customEndpoints, setCustomEndpoints] = useState<EndpointDefinition[]>(() =>
     loadStorage(customEndpointsStorageKey, [])
   );
+  const [endpointOverrides, setEndpointOverrides] = useState<EndpointOverrides>(() =>
+    loadStorage(endpointOverridesStorageKey, {})
+  );
   const [newEndpoint, setNewEndpoint] = useState<EndpointDefinition>({
     group: "custom",
     name: "",
     method: "GET",
     path: ""
   });
+  const [editTarget, setEditTarget] = useState<SidebarEndpoint | null>(null);
   const [isEndpointModalOpen, setIsEndpointModalOpen] = useState(false);
   const workspaceRef = useRef<HTMLElement | null>(null);
   const requestController = useRef<AbortController | null>(null);
@@ -114,27 +130,24 @@ export function App() {
     saveStorage("rotmg:theme", theme);
   }, [theme]);
 
-  const allPresets = useMemo(
-    () => [...builtinPresets, ...customEndpoints.map(endpointFromDefinition)],
-    [customEndpoints]
+  const sidebarEndpoints = useMemo(
+    () => buildSidebarEndpoints(endpointOverrides, customEndpoints),
+    [endpointOverrides, customEndpoints]
   );
-  const customPresetIds = useMemo(
-    () => new Set(customEndpoints.map((item) => endpointFromDefinition(item).id)),
-    [customEndpoints]
-  );
+  const hasEndpointEdits = useMemo(() => Object.keys(endpointOverrides).length > 0, [endpointOverrides]);
 
-  const groupedPresets = useMemo(() => {
-    const filtered = allPresets.filter((preset) => {
-      const haystack = `${preset.group} ${preset.name} ${preset.path}`.toLowerCase();
-      return haystack.includes(search.toLowerCase());
-    });
-    return filtered.reduce((groups, preset) => {
-      const group = groups.get(preset.group) || [];
-      group.push(preset);
-      groups.set(preset.group, group);
+  const groupedEndpoints = useMemo(() => {
+    const term = search.toLowerCase();
+    const filtered = sidebarEndpoints.filter(({ preset }) =>
+      `${preset.group} ${preset.name} ${preset.path}`.toLowerCase().includes(term)
+    );
+    return filtered.reduce((groups, item) => {
+      const group = groups.get(item.preset.group) || [];
+      group.push(item);
+      groups.set(item.preset.group, group);
       return groups;
-    }, new Map<string, EndpointPreset[]>());
-  }, [allPresets, search]);
+    }, new Map<string, SidebarEndpoint[]>());
+  }, [sidebarEndpoints, search]);
 
   const assertionResults = useMemo(() => evaluateAssertions(assertions, response), [assertions, response]);
 
@@ -283,24 +296,73 @@ export function App() {
     saveStorage(customEndpointsStorageKey, next);
   }
 
-  function addCustomEndpoint() {
+  function persistEndpointOverrides(next: EndpointOverrides) {
+    setEndpointOverrides(next);
+    saveStorage(endpointOverridesStorageKey, next);
+  }
+
+  function openAddEndpoint() {
+    setEditTarget(null);
+    setNewEndpoint({ group: "custom", name: "", method: "GET", path: "" });
+    setIsEndpointModalOpen(true);
+  }
+
+  function openEditEndpoint(item: SidebarEndpoint) {
+    setEditTarget(item);
+    setNewEndpoint({
+      group: item.preset.group,
+      name: item.preset.name,
+      method: item.preset.method,
+      path: item.preset.path
+    });
+    setIsEndpointModalOpen(true);
+  }
+
+  function closeEndpointModal() {
+    setIsEndpointModalOpen(false);
+    setEditTarget(null);
+    setNewEndpoint({ group: "custom", name: "", method: "GET", path: "" });
+  }
+
+  function submitEndpoint() {
     const name = newEndpoint.name.trim();
     const pathValue = newEndpoint.path.trim();
     if (!name || !pathValue) return;
-    const nextEndpoint: EndpointDefinition = {
+    // Only the identity fields are editable here; params/note carry over so an
+    // edit never silently drops a built-in endpoint's configured parameters.
+    const fields = {
       group: newEndpoint.group.trim() || "custom",
       name,
       method: newEndpoint.method || "GET",
-      path: pathValue.startsWith("/") ? pathValue : `/${pathValue}`,
-      params: []
+      path: pathValue.startsWith("/") ? pathValue : `/${pathValue}`
     };
-    persistCustomEndpoints([...customEndpoints, nextEndpoint]);
-    setNewEndpoint({ group: "custom", name: "", method: "GET", path: "" });
-    setIsEndpointModalOpen(false);
+    if (!editTarget) {
+      persistCustomEndpoints([...customEndpoints, { ...fields, params: [] }]);
+    } else if (editTarget.origin === "custom") {
+      persistCustomEndpoints(
+        customEndpoints.map((definition, index) =>
+          index === editTarget.index ? { ...definition, ...fields } : definition
+        )
+      );
+    } else {
+      persistEndpointOverrides({
+        ...endpointOverrides,
+        [editTarget.builtinId]: { ...editTarget.definition, ...fields }
+      });
+    }
+    closeEndpointModal();
   }
 
-  function removeCustomEndpoint(endpoint: EndpointPreset) {
-    persistCustomEndpoints(customEndpoints.filter((item) => endpointFromDefinition(item).id !== endpoint.id));
+  function deleteEndpoint(item: SidebarEndpoint) {
+    if (item.origin === "custom") {
+      persistCustomEndpoints(customEndpoints.filter((_, index) => index !== item.index));
+    } else {
+      persistEndpointOverrides({ ...endpointOverrides, [item.builtinId]: null });
+    }
+  }
+
+  function restoreBuiltinEndpoints() {
+    persistEndpointOverrides({});
   }
 
   function cancelRequest() {
@@ -359,7 +421,8 @@ export function App() {
             exportedAt: new Date().toISOString(),
             activeEnvironment: environment,
             environmentStates: loadAllEnvironmentStates(),
-            customEndpoints
+            customEndpoints,
+            endpointOverrides
           },
           null,
           2
@@ -383,10 +446,12 @@ export function App() {
         activeEnvironment?: EnvironmentKey;
         environmentStates?: Partial<Record<EnvironmentKey, EnvironmentState>>;
         customEndpoints?: EndpointDefinition[];
+        endpointOverrides?: EndpointOverrides;
         savedRequests?: SavedRequest[];
         variables?: KeyValueRow[];
       };
       if (parsed.customEndpoints) persistCustomEndpoints(parsed.customEndpoints);
+      if (parsed.endpointOverrides) persistEndpointOverrides(parsed.endpointOverrides);
       if (parsed.environmentStates) {
         for (const key of environmentKeys) {
           const state = parsed.environmentStates[key];
@@ -420,30 +485,50 @@ export function App() {
         </label>
 
         <div className="sidebar-action">
-          <button className="add-row endpoint-add-button" onClick={() => setIsEndpointModalOpen(true)}>
+          <button className="add-row endpoint-add-button" onClick={openAddEndpoint}>
             <Plus size={15} />
             Add endpoint
           </button>
+          {hasEndpointEdits && (
+            <button className="restore-endpoints" onClick={restoreBuiltinEndpoints}>
+              <RotateCcw size={13} />
+              Restore built-in endpoints
+            </button>
+          )}
         </div>
 
         <div className="sidebar-scroll">
-          {[...groupedPresets.entries()].map(([group, items]) => (
+          {[...groupedEndpoints.entries()].map(([group, items]) => (
             <section className="nav-group" key={group}>
               <div className="group-title">{group}</div>
-              {items.map((preset) => (
-                <button className="endpoint-button" key={preset.id} onClick={() => applyPreset(preset)}>
-                  <span className={`method ${preset.method.toLowerCase()}`}>{preset.method}</span>
-                  <span>{preset.name}</span>
-                  {customPresetIds.has(preset.id) && (
-                    <Trash2
-                      size={14}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        removeCustomEndpoint(preset);
-                      }}
-                    />
-                  )}
-                </button>
+              {items.map((item) => (
+                <div
+                  className="endpoint-row"
+                  key={`${item.origin}:${item.origin === "custom" ? item.index : item.builtinId}`}
+                >
+                  <button className="endpoint-button" onClick={() => applyPreset(item.preset)}>
+                    <span className={`method ${item.preset.method.toLowerCase()}`}>{item.preset.method}</span>
+                    <span className="endpoint-name">{item.preset.name}</span>
+                  </button>
+                  <div className="endpoint-actions">
+                    <button
+                      className="endpoint-action"
+                      title="Edit endpoint"
+                      aria-label={`Edit ${item.preset.name}`}
+                      onClick={() => openEditEndpoint(item)}
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      className="endpoint-action"
+                      title="Delete endpoint"
+                      aria-label={`Delete ${item.preset.name}`}
+                      onClick={() => deleteEndpoint(item)}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </section>
           ))}
@@ -656,7 +741,7 @@ export function App() {
         </section>
       </main>
       {isEndpointModalOpen && (
-        <div className="modal-backdrop" role="presentation" onClick={() => setIsEndpointModalOpen(false)}>
+        <div className="modal-backdrop" role="presentation" onClick={closeEndpointModal}>
           <section
             className="modal"
             role="dialog"
@@ -665,8 +750,8 @@ export function App() {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="modal-head">
-              <strong id="endpoint-modal-title">Add endpoint</strong>
-              <button className="icon-button small" title="Close" onClick={() => setIsEndpointModalOpen(false)}>
+              <strong id="endpoint-modal-title">{editTarget ? "Edit endpoint" : "Add endpoint"}</strong>
+              <button className="icon-button small" title="Close" onClick={closeEndpointModal}>
                 <XCircle size={14} />
               </button>
             </div>
@@ -709,12 +794,12 @@ export function App() {
               </label>
             </div>
             <div className="modal-actions">
-              <button className="soft-button" onClick={() => setIsEndpointModalOpen(false)}>
+              <button className="soft-button" onClick={closeEndpointModal}>
                 Cancel
               </button>
-              <button className="send-button modal-submit" onClick={addCustomEndpoint}>
-                <Plus size={15} />
-                Add endpoint
+              <button className="send-button modal-submit" onClick={submitEndpoint}>
+                {editTarget ? <Save size={15} /> : <Plus size={15} />}
+                {editTarget ? "Save endpoint" : "Add endpoint"}
               </button>
             </div>
           </section>
