@@ -120,6 +120,16 @@ export const builtinEndpointCatalog: EndpointDefinition[] = [
     ]
   },
   { group: "account", name: "claimLoginReward", method: "POST", path: "/account/claimLoginReward", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  // * /admin/ * //
+  { group: "admin", name: "login", method: "POST", path: "/admin/login", params: [] },
+  { group: "admin", name: "account", method: "POST", path: "/admin/account", params: [] },
+  { group: "admin", name: "fire", method: "POST", path: "/admin/fire", params: [] },
+  { group: "admin", name: "magic", method: "POST", path: "/admin/magic", params: [] },
+  { group: "admin", name: "quest", method: "POST", path: "/admin/quest", params: [] },
+  { group: "admin", name: "fame", method: "POST", path: "/admin/fame", params: [] },
+  { group: "admin", name: "grant", method: "POST", path: "/admin/grant", params: [] },
+  { group: "admin", name: "credits", method: "POST", path: "/admin/credits", params: [] },
+  { group: "admin", name: "guild", method: "POST", path: "/admin/guild", params: [] },
   // * /char/ * //
   { group: "char", name: "list", method: "POST", path: "/char/list", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   {
@@ -192,9 +202,14 @@ export const builtinEndpointCatalog: EndpointDefinition[] = [
   { group: "news", name: "list", method: "POST", path: "/news/list", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /missions/ * //
   { group: "missions", name: "getClientSeasons", method: "POST", path: "/missions/getClientSeasons", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  { group: "missions", name: "getCompetition", method: "POST", path: "/missions/getCompetition", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  { group: "missions", name: "getCompetitionScore", method: "POST", path: "/missions/getCompetitionScore", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   { group: "missions", name: "getPlayerMissions", method: "POST", path: "/missions/getPlayerMissions", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /mysterybox/ * //
   { group: "mysterybox", name: "getBoxes", method: "POST", path: "/mysterybox/getBoxes", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  // * /newsletterRewards / * //
+  { group: "newsletterRewards", name: "setNewsletterEmail", method: "POST", path: "/newsletterRewards/setNewsletterEmail", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
+  { group: "newsletterRewards", name: "getConfig", method: "POST", path: "/newsletterRewards/getConfig", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /dailyLogin/ * //
   { group: "dailyLogin", name: "fetchCalendar", method: "POST", path: "/dailyLogin/fetchCalendar", params: [{ key: "accessToken", value: "{{accessToken}}", source: "variable" }] },
   // * /inGameNews/ * //
